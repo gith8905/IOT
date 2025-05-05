@@ -1,0 +1,56 @@
+#include<ESP8266WiFi.h>
+#include<DHT.h>
+#include<WifiUdp.h>
+
+const char* ssid="XXXXX";
+const char* pass="12345678";
+const char* udpAddress="192.168.135.199";
+const int udpPort=8081;
+
+#define DHTPIN D3
+#define DHTTYPE DHT11
+DHT dht(DHTPIN,DHTTYPE);
+WiFiUDP udp;
+
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+  Serial.println();
+  Serial.println("Connection to wifi...");
+  WiFi.begin(ssid,pass);
+  while(WiFi.status()!=WL_CONNECTED){
+    delay(1000);
+    Serial.println("Connecting");
+  }
+
+  Serial.println();
+  Serial.println("Connected to WiFi.IP");
+  dht.begin();
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  delay(1000);
+  float temperature=dht.readTemperature();
+  float humidity=dht.readHumidity();
+  if(isnan(temperature) || isnan(humidity)){
+    Serial.println("Failed to read from DHT sensor");
+    return;
+  }
+  Serial.println("Temperature");
+  Serial.print(temperature);
+  Serial.println("C Humidity: ");
+  Serial.print(humidity);
+  Serial.println("%");
+  Serial.println("Sending data over UDP...");
+  udp.beginPacket(udpAddress,udpPort);
+  udp.print("Temperature :");
+  udp.print(temperature);
+  udp.print(" C,Humidity: ");
+  udp.print(humidity);
+  udp.println("%");
+  udp.endPacket();
+  Serial.println("Data sent over UDP.");
+
+}

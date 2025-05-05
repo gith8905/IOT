@@ -1,0 +1,39 @@
+ #include <SoftwareSerial.h>
+SoftwareSerial Bluetooth(8,9); // Rx,Tx (Interchange t0 9,8 on Arduino )
+int Led=13;
+int Data;
+void setup() {
+  // put your setup code here, to run once:
+  Bluetooth.begin(9600);
+  Serial.begin(9600);
+  Serial.println("Waiting for Command...");
+  Bluetooth.println("Send 1 to turn on the Led and 0 to turn off the Led");
+
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  if(Bluetooth.available())
+  {
+    Data=Bluetooth.read();
+    if(Data=='1')
+    {
+      digitalWrite(Led,HIGH);
+      Serial.println("LED ON!");
+      Bluetooth.println("LED ON!");
+    }
+    else  if(Data=='0')
+    {
+      digitalWrite(Led,LOW);
+      Serial.println("LED OFF!");
+      Bluetooth.println("LED OFF!");
+    }
+    else
+    {
+      ;
+    }
+    delay(1000);
+  }
+
+}
